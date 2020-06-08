@@ -33,6 +33,8 @@ class FloatingVideoView: UIView {
 
     @IBOutlet weak var localVideoHeightPin: NSLayoutConstraint!
     @IBOutlet weak var localVideoWidthPin: NSLayoutConstraint!
+
+    @IBOutlet weak var stackView: UIStackView!
     private var localViewTopLeftCornerFrame: CGRect!
     private var localViewTopRightCornerFrame: CGRect!
     private var localViewBottomLeftCornerFrame: CGRect!
@@ -61,14 +63,21 @@ class FloatingVideoView: UIView {
         originalFrame = self.frame
         self.controlView.backgroundColor = .clear
         self.localVideoView.layer.borderColor = UIColor.black.cgColor
+        self.remoteVideoView.layer.borderColor = UIColor.black.cgColor
+        self.remoteVideoView.layer.borderWidth = 2.0
         self.localVideoView.layer.borderWidth = 2.0
         self.localVideoView.layer.masksToBounds = true
+        self.remoteVideoView.layer.masksToBounds = true
         configureRoundedButtons(self.micButton)
         configureRoundedButtons(self.videoButton)
         configureRoundedButtons(self.screenShare)
         configureRoundedButtons(self.callEndButton, color: .red)
         manipulatedFrame = self.frame
         self.addRemoteViewPanGesture(self)
+        UIView.animate(withDuration: 0.8, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+            self.expandView(true)
+            self.updateRemoteViewHotCorners()
+        })
     }
     
     func configureRoundedButtons(_ button: UIButton, color: UIColor? = .black) {
@@ -168,12 +177,13 @@ class FloatingVideoView: UIView {
     
     //Update this method when we do orientation
      private func expandView(_ animate: Bool) {
+        self.remoteVideoView.layer.borderWidth = animate ? 2.0 : 0.0
         self.localVideoWidthPin.constant = animate ? UIConstraints.shrinkLocalVideoWidth : UIConstraints.defaultLocalVideoWidth
         self.localVideoHeightPin.constant = animate ? UIConstraints.shrinkLocalVideoHeight : UIConstraints.defaultLocalVideoHeight
-        let yPin = animate ? self.frame.height - self.frame.height/2 : UIConstraints.constant
+        let yPin = animate ? self.frame.height - self.frame.height/2.45 : UIConstraints.constant
         let xPin = CGFloat(0)
-        let height = animate ? (self.frame.height - self.frame.height/2) : self.originalFrame.height
-        let width = animate ? (self.frame.width/1.7) : self.originalFrame.width
+        let height = animate ? (self.frame.height - self.frame.height/1.7) : self.originalFrame.height
+        let width = animate ? (self.frame.width/2.3) : self.originalFrame.width
         let shrinkFrame = CGRect(x: xPin,
                                 y: yPin,
                                 width: width,
@@ -181,6 +191,7 @@ class FloatingVideoView: UIView {
         self.manipulatedFrame = animate ? shrinkFrame : originalFrame
         self.frame = self.manipulatedFrame
         self.controlView.alpha = 1.0
+        //self.stackView.spacing = animate ? 10 : 30
         self.layoutIfNeeded()
     }
     
