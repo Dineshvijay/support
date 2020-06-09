@@ -61,6 +61,7 @@ class FloatingVideoView: UIView {
     
     func setup() {
         originalFrame = self.frame
+        self.backgroundColor = .clear
         self.controlView.backgroundColor = .clear
         self.localVideoView.layer.borderColor = UIColor.black.cgColor
         self.remoteVideoView.layer.borderColor = UIColor.black.cgColor
@@ -88,16 +89,16 @@ class FloatingVideoView: UIView {
     }
     
     @IBAction func micTap(_ button: UIButton) {
-        guard let imageIcon = button.imageView?.image else {
+        guard let bgColor = button.layer.backgroundColor else {
             return
         }
-        let muteIcon = UIImage(named: "mute.png")
-        let unmuteIcon = UIImage(named: "unmute.png")
-        if imageIcon == muteIcon {
-            button.setImage(unmuteIcon, for: .normal)
+        let mute = UIColor.red.withAlphaComponent(0.80).cgColor
+        let unmute = UIColor.black.withAlphaComponent(0.80).cgColor
+        if bgColor == mute {
+            button.layer.backgroundColor = unmute
             self.controlDelegate?.muteMic(false)
         } else {
-            button.setImage(muteIcon, for: .normal)
+            button.layer.backgroundColor = mute
             self.controlDelegate?.muteMic(true)
         }
     }
@@ -191,6 +192,8 @@ class FloatingVideoView: UIView {
         self.manipulatedFrame = animate ? shrinkFrame : originalFrame
         self.frame = self.manipulatedFrame
         self.controlView.alpha = 1.0
+        self.remoteVideoView.alpha = 1.0
+        self.localVideoView.alpha = 1.0
         //self.stackView.spacing = animate ? 10 : 30
         self.layoutIfNeeded()
     }
@@ -216,6 +219,8 @@ class FloatingVideoView: UIView {
                                 height: height)
         self.frame = animate ? minimizeFrame : self.manipulatedFrame
         self.controlView.alpha = animate ? 0.0 : 1.0
+        self.remoteVideoView.alpha = animate ? 0.0 : 1.0
+        self.localVideoView.alpha = animate ? 0.0 : 1.0
         self.layoutIfNeeded()
     }
     
